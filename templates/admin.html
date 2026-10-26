@@ -1,0 +1,70 @@
+
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container py-4">
+    <h1 class="mb-2">CareerPilot Admin Panel</h1>
+    <p class="text-muted">Manage registered user accounts.</p>
+
+    <div class="card shadow-sm mt-4">
+        <div class="card-body">
+            <h5 class="card-title">Registered Users</h5>
+
+            {% if users %}
+            <div class="table-responsive">
+                <table class="table table-hover align-middle">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Email</th>
+                            <th>Role</th>
+                            <th>Status</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for user in users %}
+                        <tr>
+                            <td>{{ user.name }}</td>
+                            <td>{{ user.email }}</td>
+                            <td>{{ user.role }}</td>
+                            <td>
+                                {% if user.is_active %}
+                                    <span class="badge bg-success">Active</span>
+                                {% else %}
+                                    <span class="badge bg-danger">Suspended</span>
+                                {% endif %}
+                            </td>
+                            
+<td>
+    {% if user.id != session.get("user_id") and user.role != "admin" %}
+    <form method="POST"
+          action="{{ url_for('toggle_user_status', user_id=user.id) }}"
+          onsubmit="return confirm('Are you sure you want to change this account status?');">
+
+        <button type="submit"
+                class="btn btn-sm {% if user.is_active %}btn-warning{% else %}btn-success{% endif %}">
+            {% if user.is_active %}
+                Suspend
+            {% else %}
+                Reactivate
+            {% endif %}
+        </button>
+    </form>
+    {% else %}
+        <span class="text-muted">Protected</span>
+    {% endif %}
+</td>
+
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+                <p>No registered users found.</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,156 @@
+
+{% extends "base.html" %}
+{% block title %}Find Jobs | CareerPilot{% endblock %}
+
+{% block content %}
+
+<section class="jobs-hero mb-4">
+    <div class="eyebrow">THE OPPORTUNITY EXPLORER</div>
+    <h1 class="jobs-title mt-3">Find work that <span>moves you forward.</span></h1>
+    <p>
+        Discover roles that fit your skills, explore new possibilities,
+        and find your next opportunity.
+    </p>
+
+    <div class="jobs-hero-meta">
+        <span><i class="jobs-dot"></i> Personalized skill matching</span>
+        <span>Explore. Match. Grow.</span>
+    </div>
+</section>
+
+<form class="filter-panel jobs-filter mb-4" method="get">
+    <div class="filter-heading">
+        <div>
+            <span class="eyebrow">REFINE YOUR SEARCH</span>
+            <h2>What are you looking for?</h2>
+        </div>
+        <span class="filter-mark" aria-hidden="true">⌕</span>
+    </div>
+
+    <div class="row g-3 align-items-end">
+        <div class="col-lg-5">
+            <label class="form-label" for="job-keyword">Keyword</label>
+            <input
+                id="job-keyword"
+                class="form-control"
+                name="q"
+                value="{{ q }}"
+                placeholder="Role, company, or skill"
+            >
+        </div>
+
+        <div class="col-lg-3">
+            <label class="form-label" for="job-location">Location</label>
+            <input
+                id="job-location"
+                class="form-control"
+                name="location"
+                value="{{ location }}"
+                placeholder="Remote, Noida..."
+            >
+        </div>
+
+        <div class="col-lg-2">
+            <label class="form-label" for="job-type">Job type</label>
+            <select id="job-type" class="form-select" name="type">
+                <option value="">All types</option>
+                <option value="Internship"
+                    {{ 'selected' if selected_type == 'Internship' else '' }}>
+                    Internship
+                </option>
+                <option value="Full-time"
+                    {{ 'selected' if selected_type == 'Full-time' else '' }}>
+                    Full-time
+                </option>
+            </select>
+        </div>
+
+        <div class="col-lg-2 d-flex gap-2">
+            <button class="btn btn-primary flex-grow-1" type="submit">
+                Search →
+            </button>
+            <a class="btn btn-outline-secondary"
+               href="{{ url_for('jobs') }}"
+               aria-label="Reset search filters">
+                Reset
+            </a>
+        </div>
+    </div>
+</form>
+
+<section class="jobs-results-section">
+    <div class="jobs-results-heading">
+        <div>
+            <div class="eyebrow">YOUR SEARCH RESULTS</div>
+            <h2 class="jobs-results-title mt-2">
+                Opportunities <span class="results-count">{{ results|length }}</span>
+            </h2>
+        </div>
+        <span class="results-note">Ranked by skill match</span>
+    </div>
+
+    <div class="d-grid gap-3">
+        {% for item in results %}
+        <article class="job-card explorer-job">
+            <div class="explorer-job-main">
+                <div class="explorer-job-info">
+                    <div class="explorer-company-row">
+                        <span class="company">{{ item.job.company }}</span>
+                        <span class="job-type-label">{{ item.job.job_type }}</span>
+                    </div>
+
+                    <h3 class="explorer-job-title">
+                        <a class="job-title"
+                           href="{{ url_for('job_detail', job_id=item.job.id) }}">
+                            {{ item.job.title }}
+                        </a>
+                    </h3>
+
+                    <div class="explorer-meta">
+                        <span>⌖ {{ item.job.location }}</span>
+                        <span>·</span>
+                        <span>{{ item.job.salary }}</span>
+                    </div>
+
+                    <p class="explorer-description">
+                        {{ item.job.description }}
+                    </p>
+
+                    <div class="job-skills">
+                        {% for skill in item.job.skills %}
+                        <span class="skill">{{ skill }}</span>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <aside class="explorer-job-action">
+                  <div class="match-badge explorer-match">
+    <span>{{ item.percent|default(0) }}%</span>
+    <small>SKILL MATCH</small>
+</div>
+
+                    <a class="btn btn-primary"
+                       href="{{ url_for('job_detail', job_id=item.job.id) }}">
+                        Explore role ↗
+                    </a>
+                </aside>
+            </div>
+        </article>
+
+        {% else %}
+        <div class="empty-state jobs-empty">
+            <div class="empty-symbol">⌕</div>
+            <h3>No matching opportunities</h3>
+            <p>
+                Try a different keyword, broaden your location,
+                or clear the filters to explore all available roles.
+            </p>
+            <a href="{{ url_for('jobs') }}" class="btn btn-primary mt-3">
+                Clear filters →
+            </a>
+        </div>
+        {% endfor %}
+    </div>
+</section>
+
+{% endblock %}

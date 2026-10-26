@@ -1,0 +1,176 @@
+
+{% extends "base.html" %}
+{% block title %}{{ job.title }} | CareerPilot{% endblock %}
+
+{% block content %}
+
+<a href="{{ url_for('jobs') }}" class="link-arrow back-to-jobs">
+    ← Back to opportunities
+</a>
+
+<div class="role-page-header mt-3 mb-4">
+    <div class="role-header-main">
+        <div class="eyebrow">ROLE INTELLIGENCE</div>
+        <div class="role-company mt-3">{{ job.company }}</div>
+        <h1 class="role-page-title mt-2">{{ job.title }}</h1>
+
+        <div class="role-meta-list">
+            <span>⌖ {{ job.location }}</span>
+            <span>{{ job.job_type }}</span>
+            <span>{{ job.salary }}</span>
+        </div>
+    </div>
+
+    <div class="role-header-mark" aria-hidden="true">
+        <div class="role-mark-inner">CP<span>↗</span></div>
+        <div class="role-mark-caption">YOUR NEXT MOVE</div>
+    </div>
+</div>
+
+<div class="row g-4 align-items-start">
+    <div class="col-lg-8">
+        <section class="job-card role-content-card mb-4">
+            <div class="role-section-kicker">01 / THE OPPORTUNITY</div>
+            <h2 class="role-section-title mt-2">About this role</h2>
+            <p class="role-description">{{ job.description }}</p>
+
+            <div class="role-divider"></div>
+
+            <div class="role-section-kicker">02 / REQUIRED TOOLKIT</div>
+            <h2 class="role-section-title mt-2">Skills for this role</h2>
+            <p class="text-secondary small mb-3">
+                The skills listed below are used to calculate your profile match.
+            </p>
+
+            <div class="role-skills-list">
+                {% for skill in job.skills %}
+                <span class="skill role-skill">{{ skill }}</span>
+                {% endfor %}
+            </div>
+        </section>
+
+        <section class="job-card role-analysis-card">
+            <div class="role-section-kicker">03 / YOUR CAREER FIT</div>
+            <h2 class="role-section-title mt-2">Your skill analysis</h2>
+            <p class="text-secondary small">
+                See where your current skills align with this role and what
+                you could learn next.
+            </p>
+
+            <div class="role-score-overview">
+                <div class="role-score-ring" style="--score: {{ percent }}%;">
+                    <div class="role-score-ring-inner">
+                        <strong>{{ percent }}%</strong>
+                        <span>MATCH</span>
+                    </div>
+                </div>
+
+                <div class="role-score-copy">
+                    <div class="eyebrow">YOUR CURRENT ALIGNMENT</div>
+                    <h3>{{ matched|length }} of {{ job.skills|length }}</h3>
+                    <p class="mb-0">
+                        required skills match your saved profile.
+                    </p>
+                </div>
+            </div>
+
+            <div class="role-progress-track mb-4">
+                <div class="role-progress-fill" style="width: {{ percent }}%;"></div>
+            </div>
+
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <div class="analysis-box role-skill-box">
+                        <div class="role-skill-box-heading">
+                            <span class="role-status-dot have-dot"></span>
+                            <h3>Skills you have</h3>
+                        </div>
+
+                        {% if matched %}
+                            {% for skill in matched %}
+                            <span class="skill success-skill">{{ skill }}</span>
+                            {% endfor %}
+                            <p class="role-box-note">
+                                Skills already present in your profile.
+                            </p>
+                        {% else %}
+                            <p class="small text-secondary mb-0">
+                                No overlapping skills yet. Add relevant skills
+                                to your profile if you have them.
+                            </p>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="analysis-box role-skill-box">
+                        <div class="role-skill-box-heading">
+                            <span class="role-status-dot learn-dot"></span>
+                            <h3>Skills to develop</h3>
+                        </div>
+
+                        {% if missing %}
+                            {% for skill in missing %}
+                            <span class="skill missing-skill">{{ skill }}</span>
+                            {% endfor %}
+                            <p class="role-box-note">
+                                Potential learning priorities for this role.
+                            </p>
+                        {% else %}
+                            <p class="small text-secondary mb-0">
+                                Great! All listed skills match your profile.
+                            </p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <a href="{{ url_for('profile') }}" class="role-profile-link mt-4">
+                Update your skills <span>→</span>
+            </a>
+        </section>
+    </div>
+
+    <div class="col-lg-4">
+        <aside class="profile-card role-action-panel">
+            <div class="role-action-label">YOUR SHORTLIST</div>
+            <div class="role-save-symbol">{{ '★' if saved else '☆' }}</div>
+
+            <h2>{{ 'Role saved' if saved else 'Keep this opportunity close.' }}</h2>
+            <p>
+                {{ 'This role is in your saved jobs. You can remove it whenever you like.'
+                   if saved
+                   else 'Save this role to revisit it while planning your next career move.' }}
+            </p>
+
+            <form method="post"
+                  action="{{ url_for('save_job', job_id=job.id) }}">
+                <button type="submit"
+                        class="btn {{ 'btn-outline-primary' if saved else 'btn-primary' }} w-100">
+                    {{ 'Remove saved job' if saved else '☆ Save this job' }}
+                </button>
+            </form>
+
+            <div class="role-divider"></div>
+
+            <div class="role-transparency">
+                <span class="eyebrow">MATCH TRANSPARENCY</span>
+                <p class="small mt-2 mb-0">
+                    Your skill-match percentage is based on the number of
+                    listed job skills that overlap with the skills saved
+                    in your profile.
+                </p>
+            </div>
+
+            <div class="role-demo-note">
+                <span>ⓘ</span>
+                <p>
+                    CareerPilot is currently a prototype. Saving a job
+                    does not submit an application to an employer.
+                </p>
+            </div>
+        </aside>
+    </div>
+</div>
+
+{% endblock %}
